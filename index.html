@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Management - Odoo</title>
+    <style>
+    body{
+        font-family: sans-serif;
+    }
+    .preview-wrapper {
+        width: 100%;
+        max-width: 970px;
+        margin: 0 auto;
+        background: #ffffff;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    .device-selector {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 10px;
+        background: #f1f3f5;
+        padding: 4px;
+        border-radius: 4px;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .device-btn {
+        background: transparent;
+        border: none;
+        padding: 5px 8px;
+        border-radius: 3px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #495057;
+    }
+    .device-btn.active {
+        background-color: #714B67;
+        color: white;
+    }
+    .device-btn svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+    }
+    .app-container {
+        width: 100%;
+        max-width: 100%;
+        margin: 0 auto;
+        background: #ffffff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        overflow: hidden;
+        transition: width 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+    }
+    .navbar {
+        background-color: #714B67;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 16px;
+        font-size: 14px;
+    }
+    .navbar-left {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+    }
+    .navbar a {
+        color: white;
+        text-decoration: none;
+    }
+    .control-panel {
+        background: #ffffff;
+        border-bottom: 1px solid #dee2e6;
+        padding: 12px 16px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .control-panel-left {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+    .control-panel-middle {
+        display: flex;
+        align-items: center;
+    }
+    .control-panel-right {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        color: #495057;
+        background: #ffffff;
+        padding: 4px 8px;
+        border-radius: 4px;
+    }
+    .pagination-counter {
+        font-weight: 500;
+        color: #212529;
+        min-width: 50px;
+        text-align: right;
+    }
+    .pager-buttons {
+        display: flex;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #fff;
+    }
+    .pager-btn {
+        background: transparent;
+        border: none;
+        padding: 2px 6px;
+        cursor: pointer;
+        color: #495057;
+        font-size: 12px;
+    }
+    .pager-btn:hover {
+        background-color: #f8f9fa;
+    }
+    .pager-btn:not(:last-child) {
+        border-right: 1px solid #ced4da;
+    }
+    .view-switchers {
+        display: flex;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        overflow: hidden;
+        background: #fff;
+    }
+    .view-btn {
+        background: transparent;
+        border: none;
+        padding: 4px 6px;
+        cursor: pointer;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .view-btn:hover {
+        background-color: #f8f9fa;
+    }
+    .view-btn.active {
+        background-color: #e9ecef;
+        color: #000;
+    }
+    .view-btn:not(:last-child) {
+        border-right: 1px solid #ced4da;
+    }
+    .btn-primary {
+        background-color: #714B67;
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+    .search-bar {
+        border: 1px solid #ced4da;
+        padding: 6px 12px;
+        border-radius: 4px;
+        width: 220px;
+        max-width: 100%;
+    }
+    .content-container {
+        padding: 16px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .table-container {
+        width: 100%;
+        overflow-x: auto;
+    }
+    .odoo-table {
+        width: 100%;
+        background: white;
+        border-collapse: collapse;
+        white-space: nowrap;
+    }
+    .odoo-table th, .odoo-table td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid #dee2e6;
+        font-size: 13px;
+    }
+    .odoo-table th {
+        background-color: #fff;
+        font-weight: 600;
+        color: #495057;
+    }
+    .odoo-table tbody tr.selected-row {
+        background-color: #e8f4f8 !important;
+    }
+    .odoo-table tbody tr:hover {
+        background-color: #f1f3f5;
+    }
+    .dropdown-menu.show {
+        display: block !important;
+    }
+    .dropdown-item:hover {
+        background-color: #f1f3f5;
+        color: #16181b;
+    }
+    .kanban-board {
+        display: none;
+        gap: 16px;
+        align-items: flex-start;
+        overflow-x: auto;
+        padding-bottom: 10px;
+    }
+    .kanban-column-vertical {
+        writing-mode: vertical-lr;
+        transform: rotate(180deg);
+        background: #e9ecef;
+        border: 1px solid #ced4da;
+        padding: 12px 8px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #495057;
+        border-radius: 4px;
+        cursor: pointer;
+        text-align: center;
+        height: fit-content;
+    }
+    .kanban-column {
+        background: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        width: 320px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        flex-shrink: 0;
+    }
+    .kanban-header {
+        padding: 10px 14px;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid #dee2e6;
+        background: #fdfdfe;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+    }
+    .add-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 16px;
+        color: #6c757d;
+    }
+    .kanban-cards-list {
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .kanban-card {
+        background: #ffffff;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        padding: 10px 12px;
+        cursor: pointer;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        transition: all 0.15s ease;
+    }
+    .kanban-card:hover {
+        border-color: #714B67;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    }
+    .card-title {
+        font-weight: 600;
+        font-size: 14px;
+        color: #212529;
+        margin-bottom: 4px;
+    }
+    .card-text {
+        font-size: 12px;
+        color: #495057;
+    }
+</style>
+</head>
+<body>
+    <h2 style="font-family:sans-serif; text-align: center; color: #714B67; font-size: 45px; font-weight: 500; margin-bottom: 12px; letter-spacing: 0.5px;">Explore the Hospital Management App</h2>
+<div style="max-width: 970px; margin: 0 auto 20px auto; font-family: sans-serif; font-size: 14px; color: #495057; line-height: 1.6; text-align: left;">
+    <p style="margin: 0 0 8px 0;"><strong style="color: #212529;">How to Test It</strong><br>Please scroll down to see the full directory of registered patients. You can easily toggle to Kanban mode by clicking the button on the top right. </p>
+ 
+</div>
+<div style="text-align: left; margin-bottom: 15px;">
+    <button id="tryItBtn" style="background-color: #714B67; color: #ffffff; border: 1px solid #714B67; padding: 8px 16px; border-radius: 4px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s ease;">Try It Yourself</button>
+</div>
+
+<div class="preview-wrapper" id="previewWrapper">
+    <!-- Compact Notch Device Selector (Interactive Custom Switcher) -->
+    <div class="device-selector">
+        <button class="device-btn" id="btnLaptop" onclick="setDevice('laptop', true)" title="Desktop / Laptop View">
+            <svg viewBox="0 0 24 24"><path d="M20 18c1.1 0 1.99-.9 1.99-2L22 5c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2H0c0 1.1.9 2 2 2h20c1.1 0 2-.9 2-2h-4zM4 5h16v11H4V5z"/></svg>
+        </button>
+        <button class="device-btn" id="btnTab" onclick="setDevice('tab', true)" title="Tablet View">
+            <svg viewBox="0 0 24 24"><path d="M19 2H5c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 18H6V4h12v16z"/></svg>
+        </button>
+        <button class="device-btn active" id="btnPhone" onclick="setDevice('phone', true)" title="Mobile View">
+            <svg viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+        </button>
+    </div>
+
+    <div class="app-container" id="appContainer">
+        <!-- Top Bar -->
+        <div class="navbar">
+            <div class="navbar-left">
+                <span><strong>Hospital</strong></span>
+                <a href="#">Patients</a>
+                <a href="#">Settings</a>
+            </div>
+            <div class="navbar-right" style="position: relative;">
+                <div class="user-profile" id="userProfileBtn" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                    <span class="user-name" id="currentUserName" style="color: white; font-size: 13px;">Mitchell Admin</span>
+                    <div class="user-avatar" id="currentUserAvatar" title="User Profile" style="width: 22px; height: 22px; border-radius: 50%; background-color: #714B67; display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: bold; font-size: 11px; border: 1px solid rgba(255,255,255,0.4);">M</div>
+                </div>
+
+                <!-- Dropdown Menu for Profile Switching -->
+                <div id="profileDropdown" style="display: none; position: absolute; right: 0; top: 32px; background: white; color: #212529; border: 1px solid #dee2e6; border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 180px; z-index: 1000; overflow: hidden;">
+                    <div class="profile-switch-option" data-profile="admin" style="padding: 10px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-bottom: 1px solid #f1f3f5;">
+                        <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #714B67; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px;">M</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 12px;">Mitchell Admin</div>
+                            <div style="font-size: 10px; color: #6c757d;">Manager</div>
+                        </div>
+                    </div>
+                    <div class="profile-switch-option" data-profile="agent" style="padding: 10px 14px; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <div style="width: 24px; height: 24px; border-radius: 50%; background-color: #008784; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px;">T</div>
+                        <div>
+                            <div style="font-weight: 600; font-size: 12px;">Test Staff</div>
+                            <div style="font-size: 10px; color: #6c757d;">Staff</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Bar -->
+        <div class="control-panel">
+            <div class="control-panel-left">
+                <button class="btn-primary" onclick="createNewRecord()">New</button>
+                <div class="breadcrumb-area" id="defaultTitle">
+                    <span style="font-size: 18px; font-weight: 500;" id="breadcrumbTitle">Patients</span>
+                </div>
+            </div>
+
+            <!-- Middle Position: Search Bar or Selection Toolbar -->
+            <div class="control-panel-middle" style="display: flex; align-items: center;">
+                <input type="text" class="search-bar" id="searchInput" placeholder="Search patients..." oninput="filterContent()">
+                
+                <div class="selection-toolbar" id="selectionToolbar" style="display: none; align-items: center; gap: 8px;">
+                    <div class="selection-badge" style="background-color: #714B67; color: white; padding: 4px 10px; border-radius: 4px; font-size: 13px; display: flex; align-items: center; gap: 6px; font-weight: 500;">
+                        <span id="selectedCount">1</span> selected 
+                        <button class="clear-selection-btn" id="clearSelection" title="Unselect all" style="background: none; border: none; color: white; cursor: pointer; font-size: 14px; font-weight: bold; padding: 0 2px;">×</button>
+                    </div>
+                    <button class="toolbar-btn" id="printBtn" style="background-color: #ffffff; border: 1px solid #ced4da; color: #495057; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                        🖨️ Print
+                    </button>
+                    <div class="dropdown-container" style="position: relative; display: inline-block;">
+                        <button class="toolbar-btn" id="actionsDropdownBtn" style="background-color: #ffffff; border: 1px solid #ced4da; color: #495057; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-size: 13px; display: flex; align-items: center; gap: 6px;">
+                            ⚙️ Actions ▾
+                        </button>
+                        <div class="dropdown-menu" id="actionsMenu" style="display: none; position: absolute; top: 100%; left: 0; margin-top: 4px; background-color: #ffffff; min-width: 140px; border: 1px solid rgba(0,0,0,.15); border-radius: 4px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); z-index: 1000;">
+                            <!-- Dynamically populated based on active profile -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="control-panel-right">
+                <span class="pagination-counter" id="pageIndicator">1-7 / 7</span>
+                
+                <div class="pager-buttons">
+                    <button class="pager-btn" id="prevBtn" title="Previous">‹</button>
+                    <button class="pager-btn" id="nextBtn" title="Next">›</button>
+                </div>
+
+                <div class="view-switchers">
+                    <button class="view-btn active" data-view="list" onclick="switchView('list')" title="List View">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4h18v2H3V4zm0 7h18v2H3v-2zm0 7h18v2H3v-2z"/></svg>
+                    </button>
+                    <button class="view-btn" data-view="kanban" onclick="switchView('kanban')" title="Kanban View">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-container">
+            <!-- List View Container -->
+            <div class="table-container" id="listView">
+                <table class="odoo-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 30px;"><input type="checkbox" id="selectAllCheckbox"></th>
+                            <th>Full Name</th>
+                            <th>Gender</th>
+                            <th>Age</th>
+                            <th>Status</th>
+                            <th>Is Minor</th>
+                            <th>Active</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyContent">
+                        <tr data-id="1" onclick="openRecord('John Doe')">
+                            <td><input type="checkbox" class="row-checkbox" onclick="event.stopPropagation()"></td>
+                            <td>John Doe</td>
+                            <td>Male</td><td>34</td><td>Draft</td><td>False</td><td>True</td>
+                        </tr>
+                        <tr data-id="2" onclick="openRecord('Jane Smith')">
+                            <td><input type="checkbox" class="row-checkbox" onclick="event.stopPropagation()"></td>
+                            <td>Jane Smith</td>
+                            <td>Female</td><td>15</td><td>Confirmed</td><td>True</td><td>True</td>
+                        </tr>
+                        <tr data-id="3" onclick="openRecord('Robert Johnson')">
+                            <td><input type="checkbox" class="row-checkbox" onclick="event.stopPropagation()"></td>
+                            <td>Robert Johnson</td>
+                            <td>Male</td><td>45</td><td>Done</td><td>False</td><td>True</td>
+                        </tr>
+                        <tr data-id="4" onclick="openRecord('Emily Davis')">
+                            <td><input type="checkbox" class="row-checkbox" onclick="event.stopPropagation()"></td>
+                            <td>Emily Davis</td>
+                            <td>Female</td><td>12</td><td>Draft</td><td>True</td><td>True</td>
+                        </tr>
+                        <tr data-id="5" onclick="openRecord('Michael Brown')">
+                            <td><input type="checkbox" class="row-checkbox" onclick="event.stopPropagation()"></td>
+                            <td>Michael Brown</td>
+                            <td>Male</td><td>28</td><td>Confirmed</td><td>False</td><td>True</td>
+                        </tr>
+                        <tr data-id="6" onclick="openRecord('Sarah Wilson')">
+                            <td><input type="checkbox" class="row-checkbox" onclick="event.stopPropagation()"></td>
+                            <td>Sarah Wilson</td>
+                            <td>Female</td><td>39</td><td>Done</td><td>False</td><td>True</td>
+                        </tr>
+                        <tr data-id="7" onclick="openRecord('David Miller')">
+                            <td><input type="checkbox" class="row-checkbox" onclick="event.stopPropagation()"></td>
+                            <td>David Miller</td>
+                            <td>Male</td><td>8</td><td>Cancelled</td><td>True</td><td>False</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Kanban View Board Container -->
+            <div class="kanban-board" id="kanbanView">
+                <div class="kanban-column-vertical" onclick="expandColumn('None')">None (1)</div>
+                <div class="kanban-column" data-group="Draft">
+                    <div class="kanban-header">
+                        <span>Draft (2)</span>
+                        <button class="add-btn" onclick="addCard('Draft')">＋</button>
+                    </div>
+                    <div class="kanban-cards-list" id="cards-Draft">
+                        <div class="kanban-card" onclick="openRecord('John Doe')">
+                            <div class="card-title">John Doe</div>
+                            <div class="card-text">Age: 34 | Gender: Male</div>
+                        </div>
+                        <div class="kanban-card" onclick="openRecord('Emily Davis')">
+                            <div class="card-title">Emily Davis</div>
+                            <div class="card-text">Age: 12 | Gender: Female</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="kanban-column" data-group="Confirmed">
+                    <div class="kanban-header">
+                        <span>Confirmed (2)</span>
+                        <button class="add-btn" onclick="addCard('Confirmed')">＋</button>
+                    </div>
+                    <div class="kanban-cards-list" id="cards-Confirmed">
+                        <div class="kanban-card" onclick="openRecord('Jane Smith')">
+                            <div class="card-title">Jane Smith</div>
+                            <div class="card-text">Age: 15 | Gender: Female</div>
+                        </div>
+                        <div class="kanban-card" onclick="openRecord('Michael Brown')">
+                            <div class="card-title">Michael Brown</div>
+                            <div class="card-text">Age: 28 | Gender: Male</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</body>
+</html>
