@@ -87,7 +87,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (nextBtn) nextBtn.style.opacity = currentEnd >= appState.totalItems ? '0.5' : '1';
     }
 
-    // Initial UI state update
     updateUI();
 
     nextBtn?.addEventListener('click', () => {
@@ -161,7 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
         cb.addEventListener('change', updateSelectionState);
     });
 
-    // Clear Selection Button
     document.getElementById('clearSelection')?.addEventListener('click', () => {
         rowCheckboxes.forEach(cb => cb.checked = false);
         if (selectAllCheckbox) selectAllCheckbox.checked = false;
@@ -178,6 +176,18 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.display = card.textContent.toLowerCase().includes(query) ? 'block' : 'none';
         });
     });
+
+    // Helper function to dynamically load html2pdf if not already loaded
+    function loadHtml2PdfScript(callback) {
+        if (typeof html2pdf !== 'undefined') {
+            callback();
+            return;
+        }
+        const script = document.createElement('script');
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+        script.onload = callback;
+        document.head.appendChild(script);
+    }
 
     // Print & PDF Download functionality for Selected Patients
     document.getElementById('printBtn')?.addEventListener('click', () => {
@@ -237,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         printContent += `</body></html>`;
 
-        // 1. Open Print Window / Dialog in a new tab
+        // 1. Open Print Window / Dialog in a new tab immediately
         const printWindow = window.open('', '_blank');
         if (printWindow) {
             printWindow.document.write(printContent);
@@ -248,8 +258,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 500);
         }
 
-        // 2. Trigger automated PDF download (requires html2pdf script included in HTML head)
-        if (typeof html2pdf !== 'undefined') {
+        // 2. Dynamically load library and trigger PDF download file
+        loadHtml2PdfScript(() => {
             const element = document.createElement('div');
             element.innerHTML = printContent;
             const opt = {
@@ -260,10 +270,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             html2pdf().from(element).set(opt).save();
-        }
+        });
     });
 
-    // Row clicks & record creation handlers
+    // Row clicks & record interaction handlers
     document.querySelectorAll('#listView tbody tr').forEach(row => {
         row.addEventListener('click', () => {
             const cells = row.querySelectorAll('td');
